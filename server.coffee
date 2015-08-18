@@ -27,6 +27,7 @@ app.options '*', cors()
 terminatorController = new TerminatorController
 
 app.post '/terminate', terminatorController.terminate
+app.post '/replicate', terminatorController.replicate
 
 server = app.listen PORT, ->
   host = server.address().address
