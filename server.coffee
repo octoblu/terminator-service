@@ -26,7 +26,7 @@ app.options '*', cors()
 
 terminatorController = new TerminatorController
 
-app.post '/terminate', terminatorController.deploy
+app.post '/terminate', terminatorController.terminate
 
 server = app.listen PORT, ->
   host = server.address().address
