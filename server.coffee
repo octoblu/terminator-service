@@ -13,14 +13,17 @@ PORT = process.env.PORT ? 80
 
 meshbluConfig = new MeshbluConfig().toJSON()
 
+setRawBody = (req, res, buf) =>
+  req.rawBody = buf
+
 app = express()
 app.use cors()
 app.use morgan('combined')
 app.use errorHandler()
 app.use meshbluHealthcheck()
-app.use LogentriesWebhookAuthExpress password: meshbluConfig.token
-app.use bodyParser.urlencoded limit: '50mb', extended : true
-app.use bodyParser.json limit : '50mb'
+app.use bodyParser.urlencoded limit: '50mb', extended : true, verify: setRawBody
+app.use bodyParser.json limit : '50mb', verify: setRawBody
+app.use LogentriesWebhookAuthExpress password: meshbluConfig.token, bodyParam: 'rawBody'
 
 app.options '*', cors()
 
