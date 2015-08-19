@@ -85,7 +85,7 @@ class TerminatorModel
   _terminate: (ip, callback=->) =>
     @_findInstance ip, (error, instance) =>
       return callback error if error?
-      debug 'found instance', instance
+      debug 'found instance', instance?.InstanceId
 
       @_terminateInstance instance?.InstanceId, (error) =>
         return callback error if error?
