@@ -19,7 +19,10 @@ class TerminatorModel
       debug 'terminate ip', ip
       @_replicate ip, (error) =>
         return callback error if error?
-        callback()
+
+        @_terminate ip, (error) =>
+          return callback error if error?
+          callback()
 
   terminate: (callback=->) =>
     @_findIp (error, ip) =>
@@ -77,10 +80,7 @@ class TerminatorModel
 
       @_adjustAutoScalingGroup autoscaling.Value, (error) =>
         return callback error if error?
-
-        @_terminate ip, (error) =>
-          return callback error if error?
-          callback()
+        callback()
 
   _terminate: (ip, callback=->) =>
     @_findInstance ip, (error, instance) =>
@@ -93,7 +93,8 @@ class TerminatorModel
 
   _terminateInstance: (instanceId, callback=->) =>
     params =
-      InstanceIds: [@instanceId]
+      InstanceIds: [instanceId]
+      DryRun: false
 
     debug 'rebooting instance', instanceId
     @ec2.rebootInstances params, (error) =>
