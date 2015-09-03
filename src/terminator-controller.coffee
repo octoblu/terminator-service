@@ -17,6 +17,7 @@ class TerminatorController
     payload = JSON.parse request.body?.payload
     @terminatorModel = new @TerminatorModel payload?.event?.m
     @terminatorModel.replicate (error) ->
+      debug 'replicate', error.message if error?
       return response.status(401).json(error: 'unauthorized') if error?.message == 'unauthorized'
       return response.status(502).send(error: error.message) if error?
       return response.status(201).end()
@@ -25,6 +26,7 @@ class TerminatorController
     payload = JSON.parse request.body?.payload
     @terminatorModel = new @TerminatorModel payload?.event?.m
     @terminatorModel.terminate (error) ->
+      debug 'terminate', error.message if error?
       return response.status(401).json(error: 'unauthorized') if error?.message == 'unauthorized'
       return response.status(502).send(error: error.message) if error?
       return response.status(201).end()

@@ -19,7 +19,10 @@ class TerminatorModel
       debug 'terminate ip', ip
       @_replicate ip, (error) =>
         return callback error if error?
-        callback()
+
+        @_terminate ip, (error) =>
+          return callback error if error?
+          callback()
 
   terminate: (callback=->) =>
     @_findIp (error, ip) =>
@@ -78,7 +81,8 @@ class TerminatorModel
 
   _rebootInstance: (instanceId, callback=->) =>
     params =
-      InstanceIds: [@instanceId]
+      InstanceIds: [instanceId]
+      DryRun: false
 
     debug 'rebooting instance', instanceId
     @ec2.rebootInstances params, (error) =>
@@ -103,7 +107,7 @@ class TerminatorModel
   _terminate: (ip, callback=->) =>
     @_findInstance ip, (error, instance) =>
       return callback error if error?
-      debug 'found instance', instance
+      debug 'found instance', instance?.InstanceId
 
       @_terminateInstance instance?.InstanceId, (error) =>
         return callback error if error?
@@ -111,9 +115,10 @@ class TerminatorModel
 
   _terminateInstance: (instanceId, callback=->) =>
     params =
-      InstanceIds: [@instanceId]
+      InstanceIds: [instanceId]
+      DryRun: false
 
-    debug 'rebooting instance', instanceId
+    debug 'terminating instance', instanceId
     @ec2.terminateInstances params, (error) =>
       return callback error if error?
       callback()
