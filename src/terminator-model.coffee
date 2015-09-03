@@ -67,6 +67,24 @@ class TerminatorModel
     matches = @message.match @ipRegEx
     callback null, matches?[1].replace /-/g, '.'
 
+  _reboot: (ip, callback=->) =>
+    @_findInstance ip, (error, instance) =>
+      return callback error if error?
+      debug 'found instance', instance
+
+      @_rebootInstance instance?.InstanceId, (error) =>
+        return callback error if error?
+        callback()
+
+  _rebootInstance: (instanceId, callback=->) =>
+    params =
+      InstanceIds: [@instanceId]
+
+    debug 'rebooting instance', instanceId
+    @ec2.rebootInstances params, (error) =>
+      return callback error if error?
+      callback()
+
   _replicate: (ip, callback=->) =>
     @_findInstance ip, (error, instance) =>
       return callback error if error?
@@ -78,7 +96,7 @@ class TerminatorModel
       @_adjustAutoScalingGroup autoscaling.Value, (error) =>
         return callback error if error?
 
-        @_terminate ip, (error) =>
+        @_reboot ip, (error) =>
           return callback error if error?
           callback()
 
@@ -96,7 +114,7 @@ class TerminatorModel
       InstanceIds: [@instanceId]
 
     debug 'rebooting instance', instanceId
-    @ec2.rebootInstances params, (error) =>
+    @ec2.terminateInstances params, (error) =>
       return callback error if error?
       callback()
 
