@@ -33,6 +33,15 @@ class TerminatorModel
         return callback error if error?
         callback()
 
+  reboot: (callback=->) =>
+    @_findIp (error, ip) =>
+      return callback error if error?
+      return callback() unless ip?
+      debug 'reboot ip', ip
+      @_reboot ip, (error) =>
+        return callback error if error?
+        callback()
+
   _adjustAutoScalingGroup: (group, callback=->) =>
     @_getAutoScalingMinSize group, (error, minSize) =>
       return callback error if error?
