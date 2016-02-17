@@ -16,10 +16,10 @@ setRawBody = (req, res, buf) =>
   req.rawBody = buf
 
 app = express()
-app.use cors()
+app.use meshbluHealthcheck()
 app.use morgan('combined')
 app.use errorHandler()
-app.use meshbluHealthcheck()
+app.use cors()
 app.use bodyParser.urlencoded limit: '50mb', extended : true, verify: setRawBody
 app.use bodyParser.json limit : '50mb', verify: setRawBody
 app.use LogentriesWebhookAuthExpress password: meshbluConfig.token, bodyParam: 'rawBody'
@@ -37,3 +37,7 @@ server = app.listen PORT, ->
   port = server.address().port
 
   console.log "Server running on #{host}:#{port}"
+
+process.on 'SIGTERM', =>
+  console.log 'SIGTERM caught, exiting'
+  process.exit 0
